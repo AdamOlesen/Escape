@@ -1,0 +1,50 @@
+#include <SoftwareSerial.h>
+
+SoftwareSerial mySerial(-1,2);
+
+int digitPins[4][4] = {
+  {5,4,3,A0},
+  {9,8,7,6},
+  {13,12,11,10},
+  {A4,A3,A2,A1}
+};
+
+bool sendt = false;
+
+void setup() {
+  mySerial.begin(19200);
+
+  for (int d = 0; d < 4; d++) {
+    for (int b = 0; b < 4; b++) {
+      pinMode(digitPins[d][b], INPUT_PULLUP);
+    }
+  }
+}
+
+int readDigit(int d) {
+  int b8 = digitalRead(digitPins[d][0]);
+  int b4 = digitalRead(digitPins[d][1]);
+  int b2 = digitalRead(digitPins[d][2]);
+  int b1 = digitalRead(digitPins[d][3]);
+
+  return b8 * 8 + b4 * 4 + b2 * 2 + b1 * 1;
+}
+
+void loop() {
+  int d1 = readDigit(3);
+  int d2 = readDigit(2);
+  int d3 = readDigit(1);
+  int d4 = readDigit(0);
+
+  int kode = d1 * 1000 + d2 * 100 + d3 * 10 + d4;
+
+  if (kode == 1919 && !sendt) {
+    mySerial.print(kode);
+    sendt = true;
+  }
+
+  if (kode != 1919) {
+    sendt = false;
+    
+  }
+}
